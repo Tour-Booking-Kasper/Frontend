@@ -28,7 +28,7 @@ function App() {
       return;
     }
 
-    //Opret et completedTour objekt med de indtastede værdier fra useState variablerne
+    //Opret et completedTour objekt med de indtastede værdier fra useState variablerne / Formen
     const completedTour = {
       isBooking,
       isCancellation,
@@ -39,20 +39,20 @@ function App() {
 
     //Forsøg at sende completedTour objektet til mit backend endpoint
     try {
-      const response = await fetch("http://localhost:3000/create-tour", {
+      const response = await fetch("http://localhost:3001/create-tour", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(completedTour),
       });
-      const result = await response.json();
-      console.log("Result from API: ", result);
 
-      console.log("Completed tour: ", completedTour);
-
-      //Sæt success til true, så brugeren ser en toast
-      setIsSuccess(true);
+      if (response.ok) {
+        //Sæt success til true, så brugeren ser en toast
+        setIsSuccess(true);
+      } else {
+        console.error("Error sending tour to RabbitMQ:");
+      }
 
       setTimeout(() => {
         setIsSuccess(false);
@@ -127,7 +127,6 @@ function App() {
           </Form.Group>
         </Row>
         <Form.Group className="mb-3">
-          <Form.Label>Choose tour</Form.Label>
           <Form.Control
             as="select"
             value={selectedTour.name}
@@ -136,6 +135,7 @@ function App() {
             <option disabled value="">
               Select a tour
             </option>
+            {/* Laver en mapping af det hardcodede tours array, som kan ses i imports i toppen */}
             {tours.map((tour) => (
               <option key={tour.id} value={tour.name}>
                 {tour.name}
@@ -163,7 +163,7 @@ function App() {
           <p className="text-danger">You must choose either Book or Cancel.</p>
         )}
         <Form.Group>
-          <Form.Control type="submit" value="Submit" />
+          <Form.Control type="submit" value="Send booking" />
         </Form.Group>
       </Form>
       <ToastContainer className="p-3" position="bottom-end">
@@ -177,7 +177,7 @@ function App() {
             <strong className="me-auto">Success</strong>
           </Toast.Header>
           <Toast.Body className="toast-position">
-            Successfully registered {isBooking ? "Booking" : "Cancellation"}!
+            Successfully registered tour!
           </Toast.Body>
         </Toast>
       </ToastContainer>
