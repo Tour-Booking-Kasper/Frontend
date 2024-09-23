@@ -120,8 +120,8 @@ function App() {
           <Form.Control type="submit" value="Submit" />
         </Form.Group>
       </Form>
-      <ToastContainer className="p-3" position="top-end">
-        <Toast show={isSuccess} onClose={() => setIsSuccess(false)} delay={1000} autohide>
+      <ToastContainer className="p-3" position="bottom-end">
+        <Toast show={isSuccess} onClose={() => setIsSuccess(false)} delay={2000} autohide>
           <Toast.Header>
             <strong className="me-auto">Success</strong>
           </Toast.Header>
