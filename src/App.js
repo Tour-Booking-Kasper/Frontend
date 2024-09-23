@@ -1,7 +1,14 @@
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState } from "react";
-import { Container, Form, Row, Col, Toast, ToastContainer } from "react-bootstrap";
+import {
+  Container,
+  Form,
+  Row,
+  Col,
+  Toast,
+  ToastContainer,
+} from "react-bootstrap";
 import { tours } from "./tourData";
 
 function App() {
@@ -13,13 +20,15 @@ function App() {
   const [email, setEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (event) => {
+  //Funktion til at håndtere form submit
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (isBothSelected) {
       console.log("Cannot process when both are selected.");
       return;
     }
 
+    //Opret et completedTour objekt med de indtastede værdier fra useState variablerne
     const completedTour = {
       isBooking,
       isCancellation,
@@ -28,14 +37,47 @@ function App() {
       selectedTour,
     };
 
-    console.log("Completed tour: ", completedTour);
-    setIsSuccess(true)
+    //Forsøg at sende completedTour objektet til mit backend endpoint
+    try {
+      const response = await fetch("http://localhost:3000/create-tour", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(completedTour),
+      });
+      const result = await response.json();
+      console.log("Result from API: ", result);
 
-    setTimeout(() => {
-      setIsSuccess(false);
-    }, 3000);
+      console.log("Completed tour: ", completedTour);
+
+      //Sæt success til true, så brugeren ser en toast
+      setIsSuccess(true);
+
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 3000);
+
+      //Nulstil formen
+      resetForm();
+
+      //Fang fejl og log den til konsollen
+    } catch (error) {
+      console.error("Error sending tour to RabbitMQ", error);
+    }
   };
 
+  //Funktion til at nulstille formen
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setIsBooking(false);
+    setIsCancellation(false);
+    setSelectedTour({ id: null, name: "" });
+    setIsBothSelected(false);
+  };
+
+  //Funktion til at håndtere valg af tour fra dropdown
   const handleSelectTour = (event) => {
     const tourName = event.target.value;
     const tour = tours.find((t) => t.name === tourName);
@@ -44,6 +86,7 @@ function App() {
     }
   };
 
+  //Funktion til at håndtere de to checkboxes, hvis den ene er valgt, kan den anden ikke også være valgt
   const handleCheckboxChange = (type) => {
     if (type === "booking") {
       if (isCancellation && !isBooking) {
@@ -59,6 +102,7 @@ function App() {
     setIsBothSelected(isBooking && isCancellation);
   };
 
+  //Bruger react bootstrap til at oprette formen, da det er nemt :P
   return (
     <Container className="form-container">
       <Form onSubmit={handleSubmit}>
@@ -115,17 +159,26 @@ function App() {
             />
           </Form.Group>
         </Col>
-        {isBothSelected && <p className="text-danger">You must choose either Book or Cancel.</p>}
+        {isBothSelected && (
+          <p className="text-danger">You must choose either Book or Cancel.</p>
+        )}
         <Form.Group>
           <Form.Control type="submit" value="Submit" />
         </Form.Group>
       </Form>
       <ToastContainer className="p-3" position="bottom-end">
-        <Toast show={isSuccess} onClose={() => setIsSuccess(false)} delay={2000} autohide>
+        <Toast
+          show={isSuccess}
+          onClose={() => setIsSuccess(false)}
+          delay={2000}
+          autohide
+        >
           <Toast.Header>
             <strong className="me-auto">Success</strong>
           </Toast.Header>
-          <Toast.Body className="toast-position">Successfully registered {isBooking ? 'Booking' : 'Cancellation'}!</Toast.Body>
+          <Toast.Body className="toast-position">
+            Successfully registered {isBooking ? "Booking" : "Cancellation"}!
+          </Toast.Body>
         </Toast>
       </ToastContainer>
     </Container>
