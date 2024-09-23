@@ -127,7 +127,6 @@ function App() {
           </Form.Group>
         </Row>
         <Form.Group className="mb-3">
-          <Form.Label>Choose tour</Form.Label>
           <Form.Control
             as="select"
             value={selectedTour.name}
@@ -163,7 +162,7 @@ function App() {
           <p className="text-danger">You must choose either Book or Cancel.</p>
         )}
         <Form.Group>
-          <Form.Control type="submit" value="Submit" />
+          <Form.Control type="submit" value="Send booking" />
         </Form.Group>
       </Form>
       <ToastContainer className="p-3" position="bottom-end">
