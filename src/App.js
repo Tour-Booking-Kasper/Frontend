@@ -59,17 +59,22 @@ function App() {
       }, 3000);
 
       //Nulstil formen
-      setName("");
-      setEmail("");
-      setIsBooking(false);
-      setIsCancellation(false);
-      setSelectedTour({ id: null, name: "" });
-      setIsBothSelected(false);
+      resetForm();
 
       //Fang fejl og log den til konsollen
     } catch (error) {
       console.error("Error sending tour to RabbitMQ", error);
     }
+  };
+
+  //Funktion til at nulstille formen
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setIsBooking(false);
+    setIsCancellation(false);
+    setSelectedTour({ id: null, name: "" });
+    setIsBothSelected(false);
   };
 
   //Funktion til at håndtere valg af tour fra dropdown
